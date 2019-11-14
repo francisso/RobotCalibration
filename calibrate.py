@@ -27,8 +27,8 @@ def get_center(image, mask):
     _, im1 = cv2.threshold(saturation, 92, 255, cv2.THRESH_BINARY)
     contours = cv2.findContours(im1, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]
     contour = max(contours, key=cv2.contourArea)
-    b_rect = cv2.boundingRect(contour)
-    return (b_rect[0]+b_rect[2]/2, b_rect[1]+b_rect[3]/2)
+    b_circle = cv2.minEnclosingCircle(contour)
+    return b_circle[0]
 
 def get_world_coords(x,y, depth, camera_matrix):
     """return physical coordinates in mm
