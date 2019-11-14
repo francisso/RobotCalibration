@@ -5,9 +5,9 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description='Compute translation between RGBD camera coordinates system and a robot\'s')
-parser.add_argument('images', metavar='images',
+parser.add_argument('--images', metavar='images', default='images/', 
                     help='path to captured images')
-parser.add_argument('positions', metavar='positions',
+parser.add_argument('--positions', metavar='positions', default='positions/positions.txt',
                     help='path to robot positions')
 parser.add_argument('--br', '--ball-radius', default=24, type=float,
                     help='ball radius', dest='ball_radius')
