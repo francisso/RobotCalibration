@@ -163,15 +163,15 @@ def main():
     example = cv2.imread(os.path.join(args.images, "color_0.png"))
     width=example.shape[1]
     height=example.shape[0]
-    #ROI mask
+
+    #load data
     with open(args.roi) as f:
         roi = json.load(f)
-    #Load robot poisitions
     with open(args.positions) as f:
         ps=json.load(f)
         points =ps ["positions"]
         val_points=ps["validation"]
-    #Compute camera coordinates
+
     with open(args.cam) as f:
         camera_matrix = json.load(f)
 
