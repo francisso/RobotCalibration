@@ -8,13 +8,13 @@ To find the positions of a robot's manipulator from a camera, the robot should h
 
 ## Usage
 
-1. Put images of robot in the `images` folder
-2. Save coordinates in the robot coordinate system to the `positions/positions.txt`
-3. Set up RoI in `configs/roi.json` and camera matrix in  `configs/camera_matrix.json`
+1. Put a sequence of calibration images of a robot in the `images` folder
+2. Save the corresponding coordinates of a manipulator in the robot coordinate system to the `positions/positions.txt`
+3. Set up a RoI in `configs/roi.json` and a matrix of intrinsic camera parameters in  `configs/camera_matrix.json`
 4. Run `python3 calibrate.py` or use jupyter notebook `calibrate.ipynb`
 
 ## Dependencies
 * python3
-* opencv (4.1.0)
+* opencv (3.3.1)
 * numpy (1.14.2)
 
