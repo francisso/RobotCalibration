@@ -33,8 +33,11 @@ def get_center(image, mask):
     saturation = hsv[...,1]
     saturation[(hsv[...,0] > 15) & (hsv[...,0] < 165)]=0
     _, im1 = cv2.threshold(saturation, 92, 255, cv2.THRESH_BINARY)
+    if cv2.__version__.startswith("3."):
+        contours = cv2.findContours(im1, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[1]
+    elif cv2.__version__.startswith("4."):
+        contours = cv2.findContours(im1, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]
 
-    _, contours, _ = cv2.findContours(im1, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     
     contour = max(contours, key=cv2.contourArea)
     b_circle = cv2.minEnclosingCircle(contour)
@@ -89,7 +92,7 @@ def estimate_transformation(width,height,points,image_folder,camera_matrix,roi,b
     for i in range(number_images):
         d = np.linalg.norm(camera_coords[i])
         print(camera_coords[i])
-        camera_coords[i] += ball_radius/d
+        camera_coords[i] *= 1.0+ ball_radius/d
         print(camera_coords[i])
     
     sphere_center_in_robot_axes = np.zeros((len(points),3))
@@ -131,7 +134,7 @@ def check_accuracy(transformation,width,height,points,image_folder,camera_matrix
     for i in range(number_images):
         d = np.linalg.norm(camera_coords[i])
         print(camera_coords[i])
-        camera_coords[i] += ball_radius/d
+        camera_coords[i] =  camera_coords[i]* (d + ball_radius)/d
         print(camera_coords[i])
     print(points)
     sphere_center_in_robot_axes = np.zeros((len(points),3))
@@ -139,13 +142,17 @@ def check_accuracy(transformation,width,height,points,image_folder,camera_matrix
         sphere_center_in_robot_axes[i,0] = points[i]["x"]
         sphere_center_in_robot_axes[i,1] = points[i]["y"]
         sphere_center_in_robot_axes[i,2] = points[i]["z"] - ball_radius #robot grabs a ball in the upper point
+        print(sphere_center_in_robot_axes[i])
 
     for i in range(len(camera_coords)):
         p=np.zeros((4))
         p[0:3]=camera_coords[i][0:3]
         p[3]=1.0
         p2=np.dot(transformation,p)
-        av_acc+=np.linalg.norm(p2-sphere_center_in_robot_axes[i])
+        def norm(x):
+            return np.sqrt(x[0]**2+x[1]**2+x[2]**2)
+        av_acc+=norm(p2-sphere_center_in_robot_axes[i])
+        print (av_acc)
 
     
     return av_acc/len(camera_coords)
