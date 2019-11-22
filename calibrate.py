@@ -91,9 +91,7 @@ def estimate_transformation(width,height,points,image_folder,camera_matrix,roi,b
     camera_coords = [get_world_coords_n(i, mask, camera_matrix, image_folder) for i in range(number_images)]
     for i in range(number_images):
         d = np.linalg.norm(camera_coords[i])
-        print(camera_coords[i])
         camera_coords[i] *= 1.0+ ball_radius/d
-        print(camera_coords[i])
     
     sphere_center_in_robot_axes = np.zeros((len(points),3))
     for i in range(len(points)):
@@ -133,16 +131,13 @@ def check_accuracy(transformation,width,height,points,image_folder,camera_matrix
     camera_coords = [get_world_coords_n(i, mask, camera_matrix, image_folder) for i in range(number_images)]
     for i in range(number_images):
         d = np.linalg.norm(camera_coords[i])
-        print(camera_coords[i])
         camera_coords[i] =  camera_coords[i]* (d + ball_radius)/d
-        print(camera_coords[i])
     print(points)
     sphere_center_in_robot_axes = np.zeros((len(points),3))
     for i in range(len(points)):
         sphere_center_in_robot_axes[i,0] = points[i]["x"]
         sphere_center_in_robot_axes[i,1] = points[i]["y"]
         sphere_center_in_robot_axes[i,2] = points[i]["z"] - ball_radius #robot grabs a ball in the upper point
-        print(sphere_center_in_robot_axes[i])
 
     for i in range(len(camera_coords)):
         p=np.zeros((4))
@@ -152,7 +147,6 @@ def check_accuracy(transformation,width,height,points,image_folder,camera_matrix
         def norm(x):
             return np.sqrt(x[0]**2+x[1]**2+x[2]**2)
         av_acc+=norm(p2-sphere_center_in_robot_axes[i])
-        print (av_acc)
 
     
     return av_acc/len(camera_coords)
@@ -186,10 +180,11 @@ def main():
     trans=estimate_transformation(width,height,points,args.images,camera_matrix,roi,args.ball_radius)
     print(trans)
     print("determinant is: ", np.linalg.det(trans[:,:3]))
+    #save result
+    np.save('transformation.npy',trans)
 
     average_accuracy=check_accuracy(trans,width,height,val_points,args.validation,camera_matrix,roi,args.ball_radius)
-    print('av error: ' + str(average_accuracy))
-
+    print('average accuracy on validation ',average_accuracy)
 
     
 if __name__ == '__main__':
